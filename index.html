@@ -41,24 +41,28 @@
                 return; 
             }
 
-            // Regex patterns for automatic detection
             const carriers = [
                 { name: "UPS", pattern: /^1Z[0-9A-Z]{16}$/, url: "https://www.ups.com/track?tracknum=" },
                 { name: "FedEx", pattern: /^[0-9]{12,15}$/, url: "https://www.fedex.com/fedextrack/?trknbr=" },
-                { name: "DHL", pattern: /^[0-9]{10}$/, url: "https://www.dhl.com/en/express/tracking.html?AWB=" }
+                { name: "DHL", pattern: /^[0-9]{10}$/, url: "https://www.dhl.com/en/express/tracking.html?AWB=" },
+                { name: "The Courier Guy", pattern: /^[0-9]{11}$/, url: "https://portal.thecourierguy.co.za/track?ref=" }
             ];
 
             for(let carrier of carriers) {
                 if(carrier.pattern.test(trackingNumber)) {
                     const fullUrl = carrier.url + trackingNumber;
                     const htmlContent = `✅ <strong>Carrier Identified:</strong> ${carrier.name}<br>
-                                         🔗 <a href="${fullUrl}" target="_blank">Click here to open Track & Trace</a>`;
+                                         🔗 <a href="${fullUrl}" target="_blank">Click here to track shipment</a>`;
                     showResult(htmlContent, true);
                     return;
                 }
             }
             
-            showResult("❌ Error: Carrier format not recognized. Please verify the AWB.", false);
+            // Fallback to Google Search if carrier is not in the database
+            const googleSearchUrl = `https://www.google.com/search?q=track+${trackingNumber}`;
+            const fallbackContent = `⚠️ <strong>Carrier not in local database.</strong><br>
+                                     🔍 <a href="${googleSearchUrl}" target="_blank">Click here to search this AWB on Google</a>`;
+            showResult(fallbackContent, false);
         }
 
         function showResult(message, isSuccess) {
