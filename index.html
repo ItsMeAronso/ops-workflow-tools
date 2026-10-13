@@ -41,6 +41,7 @@
                 return; 
             }
 
+            // Updated list of carriers including The Courier Guy
             const carriers = [
                 { name: "UPS", pattern: /^1Z[0-9A-Z]{16}$/, url: "https://www.ups.com/track?tracknum=" },
                 { name: "FedEx", pattern: /^[0-9]{12,15}$/, url: "https://www.fedex.com/fedextrack/?trknbr=" },
@@ -48,6 +49,7 @@
                 { name: "The Courier Guy", pattern: /^[0-9]{11}$/, url: "https://portal.thecourierguy.co.za/track?ref=" }
             ];
 
+            // Loop to check if the AWB matches any known carrier pattern
             for(let carrier of carriers) {
                 if(carrier.pattern.test(trackingNumber)) {
                     const fullUrl = carrier.url + trackingNumber;
@@ -58,13 +60,14 @@
                 }
             }
             
-            // Fallback to Google Search if carrier is not in the database
+            // Fallback mechanism: Google Search for unknown formats
             const googleSearchUrl = `https://www.google.com/search?q=track+${trackingNumber}`;
-            const fallbackContent = `⚠️ <strong>Carrier not in local database.</strong><br>
-                                     🔍 <a href="${googleSearchUrl}" target="_blank">Click here to search this AWB on Google</a>`;
-            showResult(fallbackContent, false);
+            const fallbackContent = `⚠️ <strong>Carrier format not in local database.</strong><br>
+                                     🔍 <a href="${googleSearchUrl}" target="_blank">Search this AWB on Google</a>`;
+            showResult(fallbackContent, false); // False gives it the red background
         }
 
+        // UI rendering function
         function showResult(message, isSuccess) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
