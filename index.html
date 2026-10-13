@@ -40,15 +40,30 @@
                 return; 
             }
 
-            // רשימת החברות המוכרות שלנו
             const carriers = [
                 { name: "UPS", pattern: /^1Z[0-9A-Z]{16}$/, url: "https://www.ups.com/track?tracknum=" },
                 { name: "FedEx", pattern: /^[0-9]{12,15}$/, url: "https://www.fedex.com/fedextrack/?trknbr=" },
                 { name: "DHL", pattern: /^[0-9]{10}$/, url: "https://www.dhl.com/en/express/tracking.html?AWB=" },
-                { name: "The Courier Guy", pattern: /^[0-9]{11}$/, url: "https://portal.thecourierguy.co.za/track?ref=" }
+                { name: "The Courier Guy", pattern: /^[0-9]{11}$/, url: "https://portal.thecourierguy.co.za/track?ref=" },
+                { name: "ICL USA", pattern: /^ICL[0-9]{8,10}$/, url: "https://www.iclsystems.com/track?awb=" },
+                { name: "AIT", pattern: /^AIT[0-9]{8,10}$/, url: "https://www.aitworldwide.com/tracking?awb=" },
+                { name: "MNX", pattern: /^MNX[0-9]{8}$/, url: "https://www.mnx.com/tracking?awb=" },
+                { name: "GLS", pattern: /^[0-9]{11,14}$/, url: "https://gls-group.eu/track/" },
+                { name: "DPD", pattern: /^[0-9]{14}$/, url: "https://tracking.dpd.de/status/en/?delisId=" },
+                { name: "AIR FREIGHT", pattern: /^[0-9]{3}-[0-9]{8}$/, url: "https://www.track-trace.com/aircargo#" },
+                { name: "NNR", pattern: /^NNR[0-9]{8,10}$/, url: "https://www.nnrglobal.com/track/" },
+                { name: "TNT", pattern: /^[0-9]{9}$/, url: "https://www.tnt.com/express/en_gc/site/shipping-tools/tracking.html?searchType=CON&cons=" },
+                { name: "Aramex", pattern: /^[0-9]{10,11}$/, url: "https://www.aramex.com/us/en/track/results?mode=0&ShipmentNumber=" },
+                { name: "Royal Mail", pattern: /^[A-Z]{2}[0-9]{9}GB$/, url: "https://www.royalmail.com/track-your-item#/" },
+                { name: "SF Express", pattern: /^SF[0-9]{13}$/, url: "https://www.sf-international.com/us/en/dynamic_function/waybill/#search/bill-number/" },
+                { name: "USPS", pattern: /^9[0-9]{21}$/, url: "https://tools.usps.com/go/TrackConfirmAction?tLabels=" },
+                { name: "Canada Post", pattern: /^[0-9]{16}$/, url: "https://www.canadapost-postescanada.ca/track-reperage/en#/details/" },
+                { name: "Australia Post", pattern: /^([A-Z0-9]{13}|[A-Z0-9]{22})$/, url: "https://auspost.com.au/mypost/track/#/details/" },
+                { name: "Japan Post", pattern: /^[A-Z]{2}[0-9]{9}JP$/, url: "https://trackings.post.japanpost.jp/services/srv/search/direct?reqCodeNo1=" },
+                { name: "Swiss Post", pattern: /^[0-9]{18}$/, url: "https://www.post.ch/en/receiving-mail/track-consignments?formattedTrackingNumber=" },
+                { name: "PostNL", pattern: /^[A-Z]{2}[0-9]{9}NL$/, url: "https://postnl.post/details/" }
             ];
 
-            // בדיקה האם המספר תואם לאחת מהחברות המוכרות שלנו
             for(let carrier of carriers) {
                 if(carrier.pattern.test(trackingNumber)) {
                     const fullUrl = carrier.url + trackingNumber;
@@ -59,20 +74,10 @@
                 }
             }
             
-            // מנגנון חכם: אם המספר לא מוכר, נשלח אותו למערכת זיהוי אוניברסלית שסורקת את כל החברות
-            const universalTrackerUrl = `https://parcelsapp.com/en/tracking/${trackingNumber}`;
-            const fallbackContent = `🔍 <strong>Using Universal Tracker...</strong><br>
-                                     We are routing this to our global tracking partner to auto-detect the carrier.<br>
-                                     🔗 <a href="${universalTrackerUrl}" target="_blank">Click here to auto-detect & track</a>`;
-            showResult(fallbackContent, true); 
+            const fallbackContent = `❌ <strong>Error:</strong> Carrier format not recognized in local database.`;
+            showResult(fallbackContent, false); 
         }
 
-        function showResult(message, isSuccess) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = message;
-            resultDiv.className = isSuccess ? 'success' : 'error';
-        }
         function showResult(message, isSuccess) {
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
